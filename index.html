@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Socket.IO chat</title>
+		<style>
+body {
+	background: #DFD5A5;
+	display: flex;
+	min-height: 100vh;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	box-sizing: border-box;
+	font-family: 'sans-serif'
+	margin: 0;
+	padding: 0;
+}
+	.users {
+		width: 20vw;
+		height: 80vh;
+		margin-right: 1vw;
+		background: #628395;
+		border-radius: 10px;
+		padding: 3vw;
+		color: #DBAD6A;
+		font-size: 30px;
+		font-weight: bold;
+		text-transform: uppercase;
+		display: flex;
+		flex-direction: column;
+		-webkit-box-shadow: 0px 2px 36px -1px rgba(219,173,106,1);
+		-moz-box-shadow: 0px 2px 36px -1px rgba(219,173,106,1);
+		box-shadow: 0px 2px 36px -1px rgba(219,173,106,1);
+	}
+	.users span {
+		margin: 10px 0;
+	}
+	.inner-body {
+		width: 75vw;
+		height: 80vh;
+		background: #628395;
+		border-radius: 10px;
+		padding: 3vw;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: space-between;
+		-webkit-box-shadow: 0px 2px 36px -1px rgba(219,173,106,1);
+		-moz-box-shadow: 0px 2px 36px -1px rgba(219,173,106,1);
+		box-shadow: 0px 2px 36px -1px rgba(219,173,106,1);
+	}
+	ul {
+		width: 100%;
+		height: 80%;
+		background: white;
+		overflow-y: scroll;
+		list-style: none;
+		-webkit-box-shadow: 0px 2px 31px -1px rgba(219,173,106,1);
+		-moz-box-shadow: 0px 2px 31px -1px rgba(219,173,106,1);
+		box-shadow: 0px 2px 31px -1px rgba(219,173,106,1);
+	}
+	form {
+		height: 5%
+	}
+	input {
+		padding: 10px;
+		border-radius: 10px;
+		width: 500px;
+		border: 0;
+	}
+	button {
+		padding: 10px;
+		border-radius: 10px;
+		border: 0;
+		background: black;
+		color: white;
+	}
+	.popup {
+		width: 100vw;
+		height: 100vh;
+		background: rgba(0,0,0, 0.5);
+		display: grid;
+		place-items: center;
+		position: absolute;
+	}
+	.inner-pop-up {
+		width: 300px;
+		height: 400px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		background: white;
+		padding: 50px;
+	}
+	.inner-pop-up input {
+		width: 90%;
+		border: 1px solid black;
+		margin-bottom: 100px;
+	}
+	.inner-pop-up button {
+		padding: 20px 30px;
+		font-size: 20px;
+	}
+	.userList {
+		font-size: 20px;
+		font-weight: bold;
+		color: purple;
+		text-transform: uppercase;
+	}
+		</style>
+	</head>
+	<body>
+		<div class='popup' id='popup'>
+			<div class='inner-pop-up'>
+				<h3>USERNAME</h3>
+				<input type="text" id="username"/>
+				<button onClick='handleUser()'>enter</button>
+			</div>	
+		</div>
+		<div class='users' id='users'>
+		</div>
+		<div class='inner-body'>
+			<ul id="messages"></ul>
+			<form id="form" action="">
+				<input id="input" autocomplete="off" /><button>Send</button>
+			</form>
+
+		</div>
+	</body>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+	let socket = io();
+
+		let form = document.getElementById('form');
+		let input = document.getElementById('input');
+		let userNameEl = document.querySelector('#username');
+		let userName;
+
+		function handleUser() {
+			userName = userNameEl.value;
+			socket.emit('add username', userName);
+			popup.style.display = 'none';
+		}
+			
+		socket.on('update user list', (usersRes) => {
+			usersRes.map(user => {
+				let span = document.createElement('span');
+				span.textContent = user;
+				users.appendChild(span);
+			})
+		})
+		socket.on('chat message', function(msg) {
+			let item = `<div><span class='userList'>${msg.userName}: </span><span>${msg.msg}</span></div>`
+			messages.innerHTML += item;
+		});
+
+		form.addEventListener('submit', function(e) {
+			e.preventDefault();
+			if (input.value) {
+					socket.emit('chat message', {userName: userName, msg: input.value});
+					input.value = '';
+				}
+			});
+
+	</script>
+</html>
