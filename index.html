@@ -14,6 +14,7 @@ body {
 	font-family: 'sans-serif'
 	margin: 0;
 	padding: 0;
+	font-family: monospace;
 }
 	.users {
 		width: 20vw;
@@ -105,6 +106,8 @@ body {
 		font-size: 20px;
 		font-weight: bold;
 		color: purple;
+		display: inline-block;
+		width: 120px;
 		text-transform: uppercase;
 	}
 		</style>
@@ -129,25 +132,21 @@ body {
 	</body>
 	<script src="/socket.io/socket.io.js"></script>
 	<script>
-	let socket = io();
-
-		let form = document.getElementById('form');
-		let input = document.getElementById('input');
-		let userNameEl = document.querySelector('#username');
+		let socket = io();
 		let userName;
 
 		function handleUser() {
-			userName = userNameEl.value;
+			userName = username.value;
 			socket.emit('add username', userName);
 			popup.style.display = 'none';
 		}
 			
 		socket.on('update user list', (usersRes) => {
+			let spans = '';
 			usersRes.map(user => {
-				let span = document.createElement('span');
-				span.textContent = user;
-				users.appendChild(span);
+				spans += `<span>${user}</span>`
 			})
+			users.innerHTML = spans;
 		})
 		socket.on('chat message', function(msg) {
 			let item = `<div><span class='userList'>${msg.userName}: </span><span>${msg.msg}</span></div>`

@@ -19,7 +19,7 @@ io.on('connection', (socket) => {
   });
 	socket.on('add username', (userName) => {
 		userNames.push(userName);
-		socket.emit('update user list', userNames);
+		io.emit('update user list', userNames);
 	})
 });
 
